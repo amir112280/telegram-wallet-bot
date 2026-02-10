@@ -2,9 +2,10 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 import os
 
-TOKEN = os.environ.get("8545062307:AAEEzzNvqmP_s7ZMzO2Xah5EsneLEEga-IA")  # مطمئن شو متغیر BOT_TOKEN درست در Railway ست شده
+# توکن را از متغیر محیطی Railway می‌خوانیم
+TOKEN = os.environ.get("8545062307:AAEEzzNvqmP_s7ZMzO2Xah5EsneLEEga-IA")
 
-# وقتی /start زده می‌شود
+# دستور /start
 def start(update, context):
     keyboard = [
         [InlineKeyboardButton("واریز", callback_data='deposit')],
@@ -14,10 +15,10 @@ def start(update, context):
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text("به ربات خوش آمدید!", reply_markup=reply_markup)
 
-# وقتی یکی از دکمه‌ها زده شد
+# پاسخ به دکمه‌ها
 def button(update, context):
     query = update.callback_query
-    query.answer()  # باید جواب داده شود
+    query.answer()  # حتماً باید این را بزنیم تا تلگرام مشکلی نگیره
     if query.data == 'deposit':
         query.edit_message_text(text="شما واریز را انتخاب کردید.")
     elif query.data == 'withdraw':
@@ -25,11 +26,10 @@ def button(update, context):
     elif query.data == 'support':
         query.edit_message_text(text="ارتباط با پشتیبانی برقرار شد.")
 
-# اتصال به تلگرام
-updater = Updater(8545062307:AAEEzzNvqmP_s7ZMzO2Xah5EsneLEEga-IA)
+# راه‌اندازی ربات
+updater = Updater(TOKEN)
 updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
-# ربات را روشن می‌کنیم
 updater.start_polling()
 updater.idle()
