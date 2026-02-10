@@ -1,35 +1,29 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram import ReplyKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters
 import os
 
-# توکن را از متغیر محیطی Railway می‌خوانیم
 TOKEN = os.environ.get("8545062307:AAEEzzNvqmP_s7ZMzO2Xah5EsneLEEga-IA")
 
-# دستور /start
+keyboard = [['واریز', 'برداشت', 'پشتیبانی']]
+markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=False)
+
 def start(update, context):
-    keyboard = [
-        [InlineKeyboardButton("واریز", callback_data='deposit')],
-        [InlineKeyboardButton("برداشت", callback_data='withdraw')],
-        [InlineKeyboardButton("پشتیبانی", callback_data='support')]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("به ربات خوش آمدید!", reply_markup=reply_markup)
+    update.message.reply_text('به ربات خوش آمدید!', reply_markup=markup)
 
-# پاسخ به دکمه‌ها
-def button(update, context):
-    query = update.callback_query
-    query.answer()  # حتماً باید این را بزنیم تا تلگرام مشکلی نگیره
-    if query.data == 'deposit':
-        query.edit_message_text(text="شما واریز را انتخاب کردید.")
-    elif query.data == 'withdraw':
-        query.edit_message_text(text="شما برداشت را انتخاب کردید.")
-    elif query.data == 'support':
-        query.edit_message_text(text="ارتباط با پشتیبانی برقرار شد.")
+def handle_text(update, context):
+    text = update.message.text
+    if text == 'واریز':
+        update.message.reply_text('شما واریز را انتخاب کردید.')
+    elif text == 'برداشت':
+        update.message.reply_text('شما برداشت را انتخاب کردید.')
+    elif text == 'پشتیبانی':
+        update.message.reply_text('ارتباط با پشتیبانی برقرار شد.')
+    else:
+        update.message.reply_text('لطفاً یکی از دکمه‌ها را انتخاب کنید.')
 
-# راه‌اندازی ربات
 updater = Updater(TOKEN)
 updater.dispatcher.add_handler(CommandHandler('start', start))
-updater.dispatcher.add_handler(CallbackQueryHandler(button))
+updater.dispatcher.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
 updater.start_polling()
 updater.idle()
