@@ -1,32 +1,70 @@
-from telegram import ReplyKeyboardMarkup, Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 import os
 
 TOKEN = os.environ.get("BOT_TOKEN")
+ADMIN_ID = 123456789  # جایگزین با ایدی تلگرام خودت
 
-keyboard = [['واریز', 'برداشت', 'پشتیبانی']]
-markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=False)
+# قیمت ووچرها
+prices = {
+    "Premium Voucher": {"خرید": 100000, "فروش": 95000},
+    "U Voucher": {"خرید": 50000, "فروش": 45000},
+    "Hot Voucher": {"خرید": 70000, "فروش": 65000}
+}
+
+# منوی اصلی شیک
+def main_menu():
+    keyboard = [
+        [InlineKeyboardButton("💰 خرید ووچر", callback_data="buy")],
+        [InlineKeyboardButton("💸 فروش ووچر", callback_data="sell")],
+        [InlineKeyboardButton("📜 قیمت‌ها", callback_data="prices")],
+        [InlineKeyboardButton("🛠 پشتیبانی", callback_data="support")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
 
 # دستور /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('به ربات خوش آمدید!', reply_markup=markup)
+    welcome_text = (
+        "🌟 سلام! به ربات رسمی فروش ووچر خوش آمدید! 🌟\n\n"
+        "لطفاً یکی از گزینه‌های زیر را انتخاب کنید:"
+    )
+    await update.message.reply_text(welcome_text, reply_markup=main_menu())
 
 # پاسخ به دکمه‌ها
-async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
-    if text == 'واریز':
-        await update.message.reply_text('شما واریز را انتخاب کردید.')
-    elif text == 'برداشت':
-        await update.message.reply_text('شما برداشت را انتخاب کردید.')
-    elif text == 'پشتیبانی':
-        await update.message.reply_text('ارتباط با پشتیبانی برقرار شد.')
-    else:
-        await update.message.reply_text('لطفاً یکی از دکمه‌ها را انتخاب کنید.')
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    user_name = query.from_user.full_name
+    data = query.data
 
-# ساخت Application و اضافه کردن هندلرها
+    if data == "prices":
+        price_text = "💎 قیمت ووچرها:\n\n"
+        for name, price in prices.items():
+            price_text += f"{name}: خرید {price['خرید']} | فروش {price['فروش']}\n"
+        await query.edit_message_text(price_text, reply_markup=main_menu())
+
+    elif data == "buy":
+        keyboard = [
+            [InlineKeyboardButton(name, callback_data=f"buy_{name}")] for name in prices.keys()
+        ]
+        await query.edit_message_text("💰 خرید ووچر: لطفاً ووچر مورد نظر را انتخاب کنید:", reply_markup=InlineKeyboardMarkup(keyboard))
+
+    elif data.startswith("buy_"):
+        voucher = data.split("_")[1]
+        await query.edit_message_text(f"💰 شما {voucher} را برای خرید انتخاب کردید.\nلطفاً تعداد را وارد کنید یا پرداخت را انجام دهید.", reply_markup=main_menu())
+
+    elif data == "sell":
+        await query.edit_message_text("💸 فروش ووچر: لطفاً کد ووچر خود را ارسال کنید.", reply_markup=main_menu())
+
+    elif data == "support":
+        await query.edit_message_text("🛠 پیام شما به پشتیبانی ارسال شد.", reply_markup=main_menu())
+        await context.bot.send_message(chat_id=ADMIN_ID,
+                                       text=f"🛠 کاربر {@NBOpp} نیاز به پشتیبانی دارد!")
+
+# ساخت ربات
 app = ApplicationBuilder().token(8545062307:AAEEzzNvqmP_s7ZMzO2Xah5EsneLEEga-IA).build()
 app.add_handler(CommandHandler('start', start))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+app.add_handler(CallbackQueryHandler(button))
 
 # اجرای ربات
 app.run_polling()
