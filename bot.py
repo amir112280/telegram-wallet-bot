@@ -12,6 +12,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=reply_markup
     )
 
-app = ApplicationBuilder().token("8545062307:AAEEzzNvqmP_s7ZMzO2Xah5EsneLEEga-IA").build)
+app = ApplicationBuilder().token("8545062307:AAEEzzNvqmP_s7ZMzO2Xah5EsneLEEga-IA").build()
 app.add_handler(CommandHandler("start", start))
 app.run_polling()
