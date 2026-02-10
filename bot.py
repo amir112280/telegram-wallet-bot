@@ -2,7 +2,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 import os
 
-TOKEN = os.environ.get("BOT_TOKEN")  # مطمئن شو متغیر BOT_TOKEN درست در Railway ست شده
+TOKEN = os.environ.get("8545062307:AAEEzzNvqmP_s7ZMzO2Xah5EsneLEEga-IA")  # مطمئن شو متغیر BOT_TOKEN درست در Railway ست شده
 
 # وقتی /start زده می‌شود
 def start(update, context):
