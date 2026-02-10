@@ -26,7 +26,7 @@ def button(update, context):
         query.edit_message_text(text="ارتباط با پشتیبانی برقرار شد.")
 
 # اتصال به تلگرام
-updater = Updater(TOKEN)
+updater = Updater(8545062307:AAEEzzNvqmP_s7ZMzO2Xah5EsneLEEga-IA)
 updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
