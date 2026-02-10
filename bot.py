@@ -1,9 +1,9 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
-import os
 
-TOKEN = os.environ.get("BOT_TOKEN")
-ADMIN_ID = 123456789  # جایگزین با ایدی تلگرام خودت
+# توکن و ایدی ادمین (اینجا جایگزین کنید)
+TOKEN = "8545062307:AAEEzzNvqmP_s7ZMzO2Xah5EsneLEEga-IA"          # <-- اینجا توکن ربات خودت را بگذار
+ADMIN_ID =  AMIRROZ0       # <-- اینجا ایدی تلگرام خودت را بگذار
 
 # قیمت ووچرها
 prices = {
@@ -12,7 +12,7 @@ prices = {
     "Hot Voucher": {"خرید": 70000, "فروش": 65000}
 }
 
-# منوی اصلی شیک
+# منوی اصلی
 def main_menu():
     keyboard = [
         [InlineKeyboardButton("💰 خرید ووچر", callback_data="buy")],
@@ -30,7 +30,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_text(welcome_text, reply_markup=main_menu())
 
-# پاسخ به دکمه‌ها
+# پاسخ دکمه‌ها
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -44,9 +44,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(price_text, reply_markup=main_menu())
 
     elif data == "buy":
-        keyboard = [
-            [InlineKeyboardButton(name, callback_data=f"buy_{name}")] for name in prices.keys()
-        ]
+        keyboard = [[InlineKeyboardButton(name, callback_data=f"buy_{name}")] for name in prices.keys()]
         await query.edit_message_text("💰 خرید ووچر: لطفاً ووچر مورد نظر را انتخاب کنید:", reply_markup=InlineKeyboardMarkup(keyboard))
 
     elif data.startswith("buy_"):
@@ -58,11 +56,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "support":
         await query.edit_message_text("🛠 پیام شما به پشتیبانی ارسال شد.", reply_markup=main_menu())
-        await context.bot.send_message(chat_id=ADMIN_ID,
-                                       text=f"🛠 کاربر {@NBOpp} نیاز به پشتیبانی دارد!")
+        await context.bot.send_message(chat_id=ADMIN_ID, text=f"🛠 کاربر {user_name} نیاز به پشتیبانی دارد!")
 
 # ساخت ربات
-app = ApplicationBuilder().token(8545062307:AAEEzzNvqmP_s7ZMzO2Xah5EsneLEEga-IA).build()
+app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler('start', start))
 app.add_handler(CallbackQueryHandler(button))
 
